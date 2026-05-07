@@ -1,0 +1,19 @@
+{
+  "name": "user-management-system",
+  "version": "1.0.0",
+  "description": "User Management System with Node.js backend and vanilla JavaScript frontend",
+  "scripts": {
+    "start": "node server-native.js",
+    "start:express": "node server-express.js",
+    "start:koa": "node server-koa.js",
+    "dev": "node server-native.js",
+    "stop": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true"
+  },
+  "dependencies": {
+    "@koa/router": "^12.0.2",
+    "express": "^4.18.2",
+    "koa": "^2.16.4",
+    "koa-body": "^6.0.1",
+    "koa-static": "^5.0.0"
+  }
+}
