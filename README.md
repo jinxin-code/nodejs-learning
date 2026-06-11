@@ -1,9 +1,10 @@
 # 用户管理系统
 
-一个使用 Node.js 构建的全栈用户管理应用，包含 **三种实现版本** 用于学习对比：
+一个使用 Node.js 构建的全栈用户管理应用，包含 **四种实现版本** 用于学习对比：
 - 原生 Node.js
 - Express
 - Koa.js
+- Fastify
 
 ## 功能特性
 
@@ -24,6 +25,15 @@
 ├── server-native.js          # 原生 Node.js 服务器实现
 ├── server-express.js         # Express 服务器实现
 ├── server-koa.js             # Koa.js 服务器实现
+├── fastify/                  # Fastify 版本（独立目录）
+│   ├── server.js             # Fastify 服务器实现
+│   ├── config.js             # Fastify 配置
+│   ├── routes/               # Fastify 路由定义
+│   │   ├── health.js         # 健康检查路由
+│   │   └── users.js          # 用户管理路由
+│   ├── services/
+│   │   └── userService.js    # Fastify 业务逻辑
+│   └── package.json          # Fastify 依赖配置
 ├── services/
 │   └── userService.js        # 共享业务逻辑模块（CRUD 操作）
 ├── utils/
@@ -116,6 +126,12 @@ npm run start:express
 npm run start:koa
 ```
 
+#### Fastify 版本
+
+```bash
+npm run start:fastify
+```
+
 #### 停止服务器
 
 ```bash
@@ -161,20 +177,21 @@ http://localhost:3000
 
 ## 学习笔记
 
-### 原生 Node.js vs Express vs Koa.js 对比
+### 原生 Node.js vs Express vs Koa.js vs Fastify 对比
 
-| 特性 | 原生 Node.js | Express | Koa.js |
-|------|-------------|---------|--------|
-| 代码行数 | ~300 行 | ~150 行 | ~170 行 |
-| 路由处理 | 手动解析 URL | 内置路由 | 外部路由中间件 |
-| 静态文件 | 手动读取文件 | `express.static()` | `koa-static` |
-| 请求体 | 手动解析 | `express.json()` | `koa-body` |
-| CORS | 手动设置响应头 | 内置支持 | 手动/中间件 |
-| 异步支持 | 回调/Promise | 回调/Promise | 原生 async/await |
-| 复杂度 | 最高 | 中等 | 中等 |
-| 灵活性 | 完全控制 | 抽象封装 | 非常灵活 |
-| 设计哲学 | 无抽象 | 约定优于配置 | 极简主义 |
-| 中间件模式 | 无 | Connect 风格 | async/await |
+| 特性 | 原生 Node.js | Express | Koa.js | Fastify |
+|------|-------------|---------|--------|---------|
+| 代码行数 | ~300 行 | ~150 行 | ~170 行 | ~140 行 |
+| 路由处理 | 手动解析 URL | 内置路由 | 外部路由中间件 | 内置路由 |
+| 静态文件 | 手动读取文件 | `express.static()` | `koa-static` | `@fastify/static` |
+| 请求体 | 手动解析 | `express.json()` | `koa-body` | 内置 JSON 解析 |
+| CORS | 手动设置响应头 | 内置支持 | 手动/中间件 | `@fastify/cors` |
+| 异步支持 | 回调/Promise | 回调/Promise | 原生 async/await | 原生 async/await |
+| 复杂度 | 最高 | 中等 | 中等 | 低 |
+| 灵活性 | 完全控制 | 抽象封装 | 非常灵活 | 高 |
+| 设计哲学 | 无抽象 | 约定优于配置 | 极简主义 | 高性能优先 |
+| 中间件模式 | 无 | Connect 风格 | async/await | async/await + Hooks |
+| 性能 | 基础 | 良好 | 良好 | 优秀 |
 
 ### 各框架核心概念
 
@@ -193,15 +210,24 @@ http://localhost:3000
 2. **Context 对象** - 统一的 ctx 包含请求和响应
 3. **极简主义哲学** - 只包含核心功能
 
-### Express vs Koa.js 主要区别
+#### Fastify
+1. **高性能架构** - 基于 Node.js 最快的 HTTP 框架之一
+2. **Schema 验证** - 内置 JSON Schema 验证支持
+3. **Hooks 系统** - 生命周期钩子（onRequest, preHandler, onSend 等）
+4. **插件系统** - 强大的插件架构扩展功能
+5. **内置 JSON 解析** - 高性能的请求体解析
 
-| 方面 | Express | Koa.js |
-|------|---------|--------|
-| **中间件模式** | `(req, res, next)` | `async (ctx, next)` |
-| **错误处理** | try-catch 或错误中间件 | try-catch + await |
-| **内置功能** | 很多（路由、静态文件等） | 极少 |
-| **学习曲线** | 较低 | 稍高 |
-| **灵活性** | 好 | 优秀 |
+### Express vs Koa.js vs Fastify 主要区别
+
+| 方面 | Express | Koa.js | Fastify |
+|------|---------|--------|---------|
+| **中间件模式** | `(req, res, next)` | `async (ctx, next)` | `async (req, reply)` + Hooks |
+| **错误处理** | try-catch 或错误中间件 | try-catch + await | 内置错误处理 + 钩子 |
+| **内置功能** | 很多（路由、静态文件等） | 极少 | 核心功能 + 插件系统 |
+| **学习曲线** | 较低 | 稍高 | 中等 |
+| **灵活性** | 好 | 优秀 | 优秀 |
+| **性能** | 良好 | 良好 | 优秀 |
+| **Schema 验证** | 需第三方库 | 需第三方库 | 内置支持 |
 
 ## 安全特性
 
@@ -225,10 +251,11 @@ http://localhost:3000
 
 # User Management System
 
-A full-stack user management application built with Node.js, featuring **three implementations** for learning purposes:
+A full-stack user management application built with Node.js, featuring **four implementations** for learning purposes:
 - Native Node.js (vanilla)
 - Express
 - Koa.js
+- Fastify
 
 ## Features
 
@@ -249,6 +276,15 @@ A full-stack user management application built with Node.js, featuring **three i
 ├── server-native.js          # Native Node.js server implementation
 ├── server-express.js         # Express server implementation
 ├── server-koa.js             # Koa.js server implementation
+├── fastify/                  # Fastify version (separate directory)
+│   ├── server.js             # Fastify server implementation
+│   ├── config.js             # Fastify configuration
+│   ├── routes/               # Fastify route definitions
+│   │   ├── health.js         # Health check route
+│   │   └── users.js          # User management routes
+│   ├── services/
+│   │   └── userService.js    # Fastify business logic
+│   └── package.json          # Fastify dependency configuration
 ├── services/
 │   └── userService.js        # Shared business logic module (CRUD operations)
 ├── utils/
@@ -294,6 +330,12 @@ npm run start:express
 
 ```bash
 npm run start:koa
+```
+
+#### Fastify Version
+
+```bash
+npm run start:fastify
 ```
 
 #### Stop Server
